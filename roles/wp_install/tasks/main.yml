@@ -1,0 +1,54 @@
+---
+# tasks file for wp_install
+- name: Set platform/version specific variables
+  include_tasks: tasks/set_vars.yml
+
+- name: Perform platform/version specific tasks
+  include_tasks: "{{ lookup('first_found', __rolename_ff_params) }}"
+  vars:
+    __rolename_ff_params:
+      files:
+        - "{{ ansible_facts['distribution'] }}_{{ ansible_facts['distribution_version'] }}.yml"
+        - "{{ ansible_facts['os_family'] }}.yml"
+      paths:
+        - "{{ role_path }}/tasks/setup"
+      skip: true
+  
+- name: Create database for Wordpress with name {{ wp_db_name }}
+  community.mysql.mysql_db:
+    name: "{{ wp_db_name }}"
+    state: present
+    login_unix_socket: /run/mysql/mysql.sock
+
+- name: >
+    Create database user {{ wp_db_user }} with all database privileges
+    on {{ wp_db_name }}
+  community.mysql.mysql_user:
+    name: "{{ wb_db_user }}"
+    password: "{{ wp_db_pass }}"
+    priv: '*.*:ALL'
+    state: present
+
+- name: Download and extract latest Wordpress archive
+  ansible.builtin.unarchive:
+    src: https://wordpress.org/latest.tar.gz
+    dest: /tmp
+    remote_src: true
+
+- name: Move Wordpress files to document root directory
+  ansible.builtin.copy:
+    remote_src: true
+    src: /tmp/wordpress/
+    dest: "{{ wp_web_root }}"
+
+- name: Get secrets from Wordpress API
+  ansible.builtin.uri:
+    url: https://api.wordpress.org/secret-key/1.1/salt/
+    return_content: true
+  register: __wp_secrets
+
+- name: Template wp-config
+  ansible.builtin.template:
+    src: wp-config-sample.php.j2
+    dest: "{{ wp_web_root }}/wp-config.php"
+    mode: 0440

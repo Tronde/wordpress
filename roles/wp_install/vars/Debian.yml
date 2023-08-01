@@ -1,0 +1,5 @@
+---
+wp_packages:
+  - python3-mysqldb
+  - python3-pymysql
+  - mariadb-client

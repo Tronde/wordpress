@@ -1,0 +1,23 @@
+---
+- hosts: localhost
+  remote_user: jkastning
+  vars_files:
+    - ../defaults/main.yml
+#  roles:
+#    - wp_install
+  tasks:
+    - name: Get secrets from wordpress API
+      ansible.builtin.uri:
+        url: https://api.wordpress.org/secret-key/1.1/salt/
+        return_content: true
+      register: __wp_secrets
+
+    - name: Output __wp_secrets
+      ansible.builtin.debug:
+        var: __wp_secrets
+
+    - name: Template wp-config
+      ansible.builtin.template:
+        src: ../templates/wp-config-sample.php.j2
+        dest: /tmp/wp-config.php
+        mode: 0440

@@ -1,0 +1,6 @@
+---
+# defaults file for wp_install
+wp_db_name:
+wp_db_user:
+wp_db_pass:
+wp_web_root:

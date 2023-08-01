@@ -1,0 +1,5 @@
+---
+- name: Ensure necessary packages are installed
+  ansible.builtin.apt:
+    name: "{{ wp_packages }}"
+    state: present
