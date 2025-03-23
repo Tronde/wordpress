@@ -1,4 +1,6 @@
-# Ansible Collection - tronde.wordpress
+# [Archived] Ansible Collection - tronde.wordpress
+
+_Notice:_ This repository has been archived as future work is going to happen at [codeberg.org](https://codeberg.org) in [https://codeberg.org/Tronde/wordpress](https://codeberg.org/Tronde/wordpress).
 
 This collection contains three roles for the following use cases:
 
